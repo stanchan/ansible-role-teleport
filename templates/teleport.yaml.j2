@@ -1,0 +1,90 @@
+teleport:
+  nodename: {{ teleport_nodename }}
+  pid_file: {{ teleport_pidfile }}
+{% if teleport_auth_token %}  
+  auth_token: {{ teleport_auth_token }}
+{% endif %}
+{% if teleport_advertise_ip | default(false) %}
+  advertise_ip: {{ teleport_advertise_ip }}
+{% endif %}
+  auth_servers:
+{% for auth_server in groups["teleport_auth"] %}
+    - {{ auth_server }}:{{ teleport_auth_server_port }}
+{% endfor %}
+  connection_limits:
+    max_connections: 1000
+    max_users: 250
+  log:
+    output: syslog
+    severity: {{ teleport_log_level }}
+  storage:
+    type: {{ teleport_storage_type }}
+  data_dir: {{ teleport_data_dir }}
+auth_service:
+{% if is_teleport_auth | default(false) %}
+  enabled: yes
+  listen_addr: {{ teleport_auth_listen_address }}
+  oidc_connectors: []
+  cluster_name: {{ teleport_auth_cluster_name }}
+{% if teleport_auth_trusted_clusters|length > 0 %}
+  trusted_clusters:
+{% for cluster_ca in teleport_auth_trusted_clusters %}
+    - key_file: {{ cluster_ca }}
+{% endfor %}
+{% endif %}
+{% if teleport_auth_tokens_node|length > 0 or teleport_auth_tokens_proxy|length > 0 or teleport_auth_tokens_auth|length > 0 %}
+  tokens:
+{% for token in teleport_auth_tokens_node %}
+    - "node:{{ token }}"
+{% endfor %}
+{% for token in teleport_auth_tokens_proxy %}
+    - "proxy:{{ token }}"
+{% endfor %}
+{% for token in teleport_auth_tokens_auth %}
+    - "auth:{{ token }}"
+{% endfor %}
+{% endif %}
+{% else %}
+  enabled: no
+{% endif %}
+ssh_service:
+{% if is_teleport | default(false) %}
+  enabled: yes
+  listen_addr: {{ teleport_ssh_listen_address }}
+{% if teleport_labels | default(false) %}
+  labels:
+{% for label in teleport_labels %}
+    {{ label }}
+{% endfor %}
+{% endif %}
+{% if teleport_commands | default(false) %}
+  commands:
+{% for commands in teleport_commands %}
+{% for name, attributes in commands.iteritems() %}
+  - name: {{ name }}
+{% for key, value in attributes.iteritems() %}
+{% if key == "command" %}    command: {{ value }}
+{% elif key == "period" %}    period: {{ value }}
+{% else %}    {{ key }}: {{ value }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endif %}
+  permit_user_env: false
+{% else %}
+  enabled: no
+{% endif %}
+proxy_service:
+{% if is_teleport_proxy | default(false) %}
+  enabled: yes
+  listen_addr: {{ teleport_proxy_listen_address }}
+  web_listen_addr: {{ teleport_proxy_web_listen_address }}
+  tunnel_listen_addr: {{ teleport_proxy_tunnel_listen_address }}
+{% if teleport_proxy_https_key_file %}
+  https_key_file: {{ teleport_proxy_https_key_file }}
+  https_cert_file: {{ teleport_proxy_https_cert_file }}
+{% endif %}
+{% else %}
+  enabled: no
+{% endif %}

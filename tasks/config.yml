@@ -1,0 +1,10 @@
+---
+- name: Create teleport config
+  template:
+    src: teleport.yaml.j2
+    dest: "{{ teleport_conf_path }}"
+    mode: 0600
+    owner: "{{ teleport_user }}"
+    group: "{{ teleport_group }}"
+  notify:
+    - restart teleport

@@ -1,0 +1,53 @@
+---
+- name: Check teleport version
+  command: "{{ teleport_bin_path }}/teleport version"
+  args:
+    chdir: "{{ teleport_bin_path }}"
+  register: teleport_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Download alpine teleport package
+  get_url:
+    url: "{{ teleport_alpine_url }}"
+    dest: "{{ teleport_releases_path }}"
+  when: (ansible_os_family == "Alpine") and (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
+
+- name: Download redhat/debian teleport package
+  get_url:
+    url: "{{ teleport_url }}"
+    dest: "{{ teleport_releases_path }}"
+  when: (ansible_os_family == "Redhat" or ansible_os_family == "Debian") and (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
+
+- name: Unarchive teleport package
+  unarchive:
+    copy: no
+    src: "{{ teleport_releases_path }}/{{ teleport_package }}"
+    dest: /tmp
+  when: (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
+
+- name: Copy teleport binary
+  copy:
+    src: "/tmp/teleport/{{ item }}"
+    dest: "{{ teleport_bin_path }}/{{ item }}"
+    owner: "{{ teleport_user }}"
+    group: "{{ teleport_group }}"
+    remote_src: yes
+    mode: 0755
+  with_items:
+    - tctl
+    - teleport
+    - tsh
+  notify: restart teleport
+  when: is_teleport and (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
+
+- name: Link teleport binary
+  file:
+    src: "{{ teleport_bin_path }}/{{ item }}"
+    dest: "/usr/bin/{{ item }}"
+    state: link
+  with_items:
+    - tctl
+    - teleport
+    - tsh
+  when: is_teleport

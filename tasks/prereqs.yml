@@ -1,0 +1,58 @@
+---
+
+- name: Setup apt
+  include_tasks: apt.yml
+
+- name: Install dependent packages
+  apk:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ required_packages }}"
+
+# - name: create teleport group
+#   group:
+#     name: "{{ teleport_group }}"
+#     system: yes
+#     state: present
+
+# - name: create teleport user
+#   user:
+#     name: "{{ teleport_user }}"
+#     state: present
+#     comment: "{{ teleport_user }}"
+#     group: "{{ teleport_group }}"
+#     shell: /sbin/nologin
+#     createhome: no
+#     system: yes
+
+- name: Create ssl cert directory
+  file:
+    path: "{{ teleport_ssl_cert_path }}"
+    state: directory
+    owner: "{{ teleport_user }}"
+    group: "{{ teleport_group }}"
+    mode: 0755
+
+- name: Create data directory
+  file:
+    path: "{{ teleport_data_dir }}"
+    state: directory
+    owner: "{{ teleport_user }}"
+    group: "{{ teleport_group }}"
+    mode: 0755
+
+- name: Create release directory
+  file:
+    path: "{{ teleport_releases_path }}"
+    state: directory
+    owner: "{{ teleport_user }}"
+    group: "{{ teleport_group }}"
+    mode: 0755
+
+- name: Create log directory
+  file:
+    path: "{{ teleport_log_path }}"
+    state: directory
+    owner: "{{ teleport_user }}"
+    group: "{{ teleport_group }}"
+    mode: 0755

@@ -1,0 +1,40 @@
+---
+- name: Create teleport openrc service
+  template:
+    src: teleport.openrc.j2
+    dest: /etc/init.d/teleport
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_service_mgr == "openrc"
+  notify:
+    - restart teleport
+
+- name: Create teleport sysv service
+  template:
+    src: teleport.init.j2
+    dest: /etc/init.d/teleport
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_service_mgr == "sysvinit"
+  notify:
+    - restart teleport
+
+- name: Create teleport systemd service
+  template:
+    src: teleport.service.j2
+    dest: "{{ systemd_service_dir }}/teleport.service"
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_service_mgr == "systemd"
+  register: systemd_setup
+  notify:
+    - restart teleport
+
+- name: Reload teleport service
+  systemd:
+    name: teleport
+    daemon_reload: yes
+  when: systemd_setup.changed

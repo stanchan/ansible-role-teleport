@@ -1,0 +1,50 @@
+#!/sbin/openrc-run
+
+DESC="Teleport SSH Service"
+NAME=teleport
+USER={{ teleport_user }}
+GROUP={{ teleport_group }}
+ROOT={{ teleport_data_dir }}
+LOG_PATH={{ teleport_log_path }}
+LOG_FILE={{ teleport_log_file }}
+DAEMON={{ teleport_bin_path }}/$NAME
+DAEMON_ARGS="start --config={{ teleport_conf_path }} {{ teleport_opts | default('') }}"
+PIDFILE={{ teleport_pidfile }}
+SCRIPTNAME=/etc/init.d/$NAME
+
+depend() {
+    need net
+    need localmount
+    use logger
+}
+
+start()
+{
+	ebegin "Starting $DESC"
+	start-stop-daemon --test --start --quiet --make-pidfile --pidfile $PIDFILE \
+                    --background --chuid $USER:$GROUP --chdir $ROOT \
+                    --startas /bin/bash -- -c "exec $DAEMON $DAEMON_ARGS >> $LOG_PATH/$LOG_FILE > /dev/null" \
+    || return 1
+	start-stop-daemon --start --quiet --make-pidfile --pidfile $PIDFILE \
+                    --background --chuid $USER:$GROUP --chdir $ROOT \
+                    --startas /bin/bash -- -c "exec $DAEMON $DAEMON_ARGS >> $LOG_PATH/$LOG_FILE 2>&1" \
+    || return 2
+	eend $?
+}
+
+stop()
+{
+	ebegin "Stopping $DESC"
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --exec $DAEMON
+	[ "$?" = 2 ] && eend 2
+	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
+	[ "$?" = 2 ] && eend 2
+	rm -f $PIDFILE
+	eend $?
+}
+
+reload() {
+	ebegin "Reloading $DESC"
+	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --exec $DAEMON
+	eend $?
+}

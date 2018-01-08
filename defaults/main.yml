@@ -1,0 +1,51 @@
+---
+required_packages: []
+
+teleport_nodename: "{{ ansible_nodename }}"
+teleport_user: root
+teleport_group: root
+
+teleport_version: 2.4.0-rc.4
+teleport_release_system: linux-amd64
+teleport_release_name: "teleport-{{ teleport_version }}.{{ teleport_release_system }}"
+teleport_package: "teleport-v{{ teleport_version }}-{{ teleport_release_system }}-bin.tar.gz"
+teleport_alpine_url: "https://github.com/stanchan/teleport/releases/download/v{{ teleport_version }}/{{ teleport_package }}"
+teleport_url: "https://github.com/gravitational/teleport/releases/download/v{{ teleport_version }}/{{ teleport_package }}"
+teleport_releases_path: "{{ teleport_data_dir }}/releases"
+teleport_bin_path: /usr/local/bin
+teleport_force_deploy: false
+teleport_ssl_cert_path: "/etc/teleport/certs"
+teleport_conf_path: "/etc/teleport/teleport.yaml"
+teleport_auth_token: ""
+teleport_auth_server_port: 3025
+teleport_data_dir: "/var/lib/teleport"
+
+teleport_log_level: "WARN"
+teleport_log_path: "/var/log/teleport"
+teleport_log_file: "teleport.log"
+teleport_storage_type: "bolt"
+teleport_pidfile: "/var/run/teleport.pid"
+
+# auth service
+teleport_auth_enabled: false
+teleport_auth_listen_address: "0.0.0.0:3025"
+teleport_auth_cluster_name: "main"
+teleport_auth_tokens_node: []
+teleport_auth_tokens_proxy: []
+teleport_auth_tokens_auth: []
+teleport_auth_trusted_clusters: []
+teleport_auth_oidc_connectors: []
+
+# ssh service
+teleport_ssh_enabled: false
+teleport_ssh_listen_address: "0.0.0.0:3022"
+teleport_labels: []
+teleport_commands: []
+
+# proxy service
+teleport_proxy_enabled: false
+teleport_proxy_listen_address: "0.0.0.0:3023"
+teleport_proxy_web_listen_address: "0.0.0.0:3080"
+teleport_proxy_tunnel_listen_address: "0.0.0.0:3024"
+teleport_proxy_https_key_file: ""
+teleport_proxy_https_cert_file: ""
