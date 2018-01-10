@@ -11,12 +11,14 @@
   get_url:
     url: "{{ teleport_alpine_url }}"
     dest: "{{ teleport_releases_path }}"
+    validate_certs: "{{ teleport_verify_ssl }}"
   when: (ansible_os_family == "Alpine") and (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
 
 - name: Download redhat/debian teleport package
   get_url:
     url: "{{ teleport_url }}"
     dest: "{{ teleport_releases_path }}"
+    validate_certs: "{{ teleport_verify_ssl }}"
   when: (ansible_os_family == "Redhat" or ansible_os_family == "Debian") and (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
 
 - name: Unarchive teleport package

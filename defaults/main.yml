@@ -12,6 +12,7 @@ teleport_release_name: "teleport-{{ teleport_version }}.{{ teleport_release_syst
 teleport_package: "teleport-v{{ teleport_version }}-{{ teleport_release_system }}-bin.tar.gz"
 teleport_alpine_url: "https://github.com/stanchan/teleport/releases/download/v{{ teleport_version }}/{{ teleport_package }}"
 teleport_url: "https://github.com/gravitational/teleport/releases/download/v{{ teleport_version }}/{{ teleport_package }}"
+teleport_verify_ssl: yes
 teleport_releases_path: "{{ teleport_data_dir }}/releases"
 teleport_bin_path: /usr/local/bin
 teleport_force_deploy: false
