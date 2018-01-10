@@ -1,5 +1,6 @@
 ---
 required_packages: []
+systemd_service_dir: /lib/systemd/system
 
 teleport_nodename: "{{ ansible_nodename }}"
 teleport_user: root
