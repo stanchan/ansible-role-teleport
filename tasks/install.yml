@@ -5,21 +5,26 @@
     chdir: "{{ teleport_bin_path }}"
   register: teleport_check
   ignore_errors: yes
-  changed_when: false
+  changed_when: yes
 
-- name: Download alpine teleport package
-  get_url:
-    url: "{{ teleport_alpine_url }}"
-    dest: "{{ teleport_releases_path }}"
-    validate_certs: "{{ teleport_verify_ssl }}"
-  when: (ansible_os_family == "Alpine") and (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
+- name: Set teleport_package for Alpine
+  set_fact:
+    teleport_package: "{{ teleport_alpine_package }}"
+    teleport_url: "{{ teleport_alpine_url }}"
+  when: ansible_os_family == "Alpine"
 
-- name: Download redhat/debian teleport package
+- name: Set teleport_package for Redhat/Debian
+  set_fact:
+    teleport_package: "{{ teleport_linux_package }}"
+    teleport_url: "{{ teleport_linux_url }}"
+  when: (ansible_os_family == "Redhat" or ansible_os_family == "Debian")
+
+- name: Download teleport package
   get_url:
     url: "{{ teleport_url }}"
     dest: "{{ teleport_releases_path }}"
     validate_certs: "{{ teleport_verify_ssl }}"
-  when: (ansible_os_family == "Redhat" or ansible_os_family == "Debian") and (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
+  when: (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
 
 - name: Unarchive teleport package
   unarchive:
