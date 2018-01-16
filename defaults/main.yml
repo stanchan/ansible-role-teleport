@@ -2,7 +2,7 @@
 required_packages: []
 systemd_service_dir: /lib/systemd/system
 
-teleport_nodename: "{{ ansible_hostname }}"
+teleport_nodename: "{{ ansible_fqdn }}"
 teleport_user: root
 teleport_group: root
 
