@@ -1,4 +1,10 @@
 ---
+- name: Merge teleport_labels
+  merge_vars:
+    suffix_to_merge: labels__to_merge
+    merged_var_name: teleport_labels
+    expected_type: 'list'
+
 - name: Create teleport config
   template:
     src: teleport.yaml.j2
