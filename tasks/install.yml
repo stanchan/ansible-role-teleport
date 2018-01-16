@@ -13,11 +13,11 @@
     teleport_url: "{{ teleport_alpine_url }}"
   when: ansible_os_family == "Alpine"
 
-- name: Set teleport_package for Redhat/Debian
+- name: Set teleport_package for RedHat/Debian
   set_fact:
     teleport_package: "{{ teleport_linux_package }}"
     teleport_url: "{{ teleport_linux_url }}"
-  when: (ansible_os_family == "Redhat" or ansible_os_family == "Debian")
+  when: (ansible_os_family == "RedHat" or ansible_os_family == "Debian")
 
 - name: Download teleport package
   get_url:

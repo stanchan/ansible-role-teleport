@@ -2,7 +2,7 @@
 required_packages: []
 systemd_service_dir: /lib/systemd/system
 
-teleport_nodename: "{{ ansible_nodename }}"
+teleport_nodename: "{{ ansible_hostname }}"
 teleport_user: root
 teleport_group: root
 
@@ -12,7 +12,7 @@ teleport_release_name: "teleport-{{ teleport_version }}.{{ teleport_release_syst
 teleport_alpine_package: "teleport-v{{ teleport_version }}-{{ teleport_release_system }}-bin-alpine.tar.gz"
 teleport_linux_package: "teleport-v{{ teleport_version }}-{{ teleport_release_system }}-bin.tar.gz"
 teleport_alpine_url: "https://github.com/stanchan/teleport/releases/download/v{{ teleport_version }}/{{ teleport_alpine_package }}"
-teleport_linux_url: "https://github.com/gravitational/teleport/releases/download/v{{ teleport_version }}/{{ teleport_linux_package }}"
+teleport_linux_url: "https://github.com/stanchan/teleport/releases/download/v{{ teleport_version }}/{{ teleport_linux_package }}"
 teleport_verify_ssl: yes
 teleport_releases_path: "{{ teleport_data_dir }}/releases"
 teleport_bin_path: /usr/local/bin
