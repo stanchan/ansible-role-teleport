@@ -1,7 +1,10 @@
 ---
 
-- name: Setup apt
-  include_tasks: apt.yml
+- name: Setup debian
+  include_tasks: debian.yml
+
+- name: Setup redhat
+  include_tasks: redhat.yml
 
 - name: Install dependent packages
   apk:
