@@ -33,6 +33,14 @@
   notify:
     - restart teleport
 
+- name: Create teleport systemd pid directory
+  file:
+    path: "{{ /run/teleport }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Reload teleport service
   systemd:
     name: teleport

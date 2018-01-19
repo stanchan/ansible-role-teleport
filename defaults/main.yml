@@ -1,6 +1,8 @@
 ---
 required_packages: []
 systemd_service_dir: /lib/systemd/system
+systemd_pid_dir: /run/teleport
+systemd_pid_file: "{{ systemd_pid_dir }}/teleport.pid"
 
 teleport_nodename: "{{ ansible_fqdn }}"
 teleport_user: root
