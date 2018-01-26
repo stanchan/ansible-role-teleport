@@ -3,13 +3,13 @@
   set_fact:
     is_teleport: "{{ inventory_hostname in groups['teleport'] }}"
 
-- name: Set is_teleport_auth if in teleport_auth group
+- name: Set is_teleport_auth if in teleport-auth group
   set_fact:
-    is_teleport_auth: "{{ inventory_hostname in groups['teleport_auth'] }}"
+    is_teleport_auth: "{{ inventory_hostname in groups['teleport-auth'] }}"
 
-- name: Set is_teleport_proxy if in teleport_proxy group
+- name: Set is_teleport_proxy if in teleport-proxy group
   set_fact:
-    is_teleport_proxy: "{{ inventory_hostname in groups['teleport_proxy'] }}"
+    is_teleport_proxy: "{{ inventory_hostname in groups['teleport-proxy'] }}"
 
 - name: Setup prereqs
   include_tasks: prereqs.yml

@@ -8,7 +8,7 @@ teleport:
   advertise_ip: {{ teleport_advertise_ip }}
 {% endif %}
   auth_servers:
-{% for auth_server in groups["teleport_auth"] %}
+{% for auth_server in groups["teleport-auth"] %}
     - {{ auth_server }}:{{ teleport_auth_server_port }}
 {% endfor %}
   connection_limits:
