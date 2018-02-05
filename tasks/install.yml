@@ -11,13 +11,19 @@
   set_fact:
     teleport_package: "{{ teleport_alpine_package }}"
     teleport_url: "{{ teleport_alpine_url }}"
-  when: ansible_os_family == "Alpine"
+  when: (ansible_os_family == "Alpine") and (ansible_architecture == "x86_64")
 
 - name: Set teleport_package for RedHat/Debian
   set_fact:
     teleport_package: "{{ teleport_linux_package }}"
     teleport_url: "{{ teleport_linux_url }}"
-  when: (ansible_os_family == "RedHat" or ansible_os_family == "Debian")
+  when: (ansible_os_family == "RedHat" or ansible_os_family == "Debian") and (ansible_architecture == "x86_64")
+
+- name: Set teleport_package for ARM architecture
+  set_fact:
+    teleport_package: "{{ teleport_linux_arm_package }}"
+    teleport_url: "{{ teleport_linux_arm_url }}"
+  when: (ansible_os_family == "Debian") and (ansible_architecture == "armv7l")
 
 - name: Download teleport package
   get_url:
