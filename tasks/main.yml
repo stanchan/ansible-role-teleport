@@ -1,32 +1,18 @@
 ---
-- name: Set is_teleport if in teleport group
+- name: Set roles
   set_fact:
     is_teleport: "{{ inventory_hostname in groups['teleport'] }}"
-
-- name: Set is_teleport_auth if in teleport-auth group
-  set_fact:
     is_teleport_auth: "{{ inventory_hostname in groups['teleport-auth'] }}"
-
-- name: Set is_teleport_proxy if in teleport-proxy group
-  set_fact:
     is_teleport_proxy: "{{ inventory_hostname in groups['teleport-proxy'] }}"
 
 - name: Setup prereqs
   include_tasks: prereqs.yml
-  tags:
-    - install
 
 - name: Install apps
   include_tasks: install.yml
-  tags:
-    - install
 
 - name: Setup configs
   include_tasks: config.yml
-  tags:
-    - config
 
 - name: Setup services
   include_tasks: service.yml
-  tags:
-    - config

@@ -30,14 +30,14 @@
     url: "{{ teleport_url }}"
     dest: "{{ teleport_releases_path }}"
     validate_certs: "{{ teleport_verify_ssl }}"
-  when: (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
+  when: (teleport_check is failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
 
 - name: Unarchive teleport package
   unarchive:
     copy: no
     src: "{{ teleport_releases_path }}/{{ teleport_package }}"
     dest: /tmp
-  when: (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
+  when: (teleport_check is failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
 
 - name: Copy teleport binary
   copy:
@@ -47,19 +47,19 @@
     group: "{{ teleport_group }}"
     remote_src: yes
     mode: 0755
-  with_items:
+  loop:
     - tctl
     - teleport
     - tsh
   notify: restart teleport
-  when: is_teleport and (teleport_check|failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
+  when: is_teleport and (teleport_check is failed or ( teleport_version not in teleport_check.stderr ) or teleport_force_deploy)
 
 - name: Link teleport binary
   file:
     src: "{{ teleport_bin_path }}/{{ item }}"
     dest: "/usr/bin/{{ item }}"
     state: link
-  with_items:
+  loop:
     - tctl
     - teleport
     - tsh

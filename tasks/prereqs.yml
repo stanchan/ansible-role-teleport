@@ -7,7 +7,7 @@
   include_tasks: redhat.yml
 
 - name: Install dependent packages
-  apk:
+  package:
     name: "{{ item }}"
     state: present
   with_items: "{{ required_packages }}"

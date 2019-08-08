@@ -1,6 +1,6 @@
 ---
 required_packages: []
-systemd_service_dir: /lib/systemd/system
+systemd_service_dir: /etc/systemd/system
 systemd_pid_dir: /run/teleport
 systemd_pid_file: "{{ systemd_pid_dir }}/teleport.pid"
 
@@ -8,7 +8,7 @@ teleport_nodename: "{{ ansible_fqdn }}"
 teleport_user: root
 teleport_group: root
 
-teleport_version: 2.4.1
+teleport_version: 3.0.1
 teleport_repo_base_url: https://github.com/stanchan/teleport/releases/download
 teleport_alpine_package: "teleport-v{{ teleport_version }}-linux-amd64-bin-alpine.tar.gz"
 teleport_linux_package: "teleport-v{{ teleport_version }}-linux-amd64-bin.tar.gz"
