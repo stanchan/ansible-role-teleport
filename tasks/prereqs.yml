@@ -1,5 +1,4 @@
 ---
-
 - name: Setup debian
   include_tasks: debian.yml
 

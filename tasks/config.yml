@@ -1,8 +1,8 @@
 ---
-- name: Merge teleport_labels
+- name: Merge teleport_ssh_labels
   merge_vars:
     suffix_to_merge: labels__to_merge
-    merged_var_name: teleport_labels
+    merged_var_name: teleport_ssh_labels
     expected_type: 'list'
 
 - name: Create teleport config

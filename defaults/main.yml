@@ -8,7 +8,7 @@ teleport_nodename: "{{ ansible_fqdn }}"
 teleport_user: root
 teleport_group: root
 
-teleport_version: 3.0.1
+teleport_version: 4.0.4
 teleport_repo_base_url: https://github.com/stanchan/teleport/releases/download
 teleport_alpine_package: "teleport-v{{ teleport_version }}-linux-amd64-bin-alpine.tar.gz"
 teleport_linux_package: "teleport-v{{ teleport_version }}-linux-amd64-bin.tar.gz"
@@ -26,11 +26,19 @@ teleport_auth_token: ""
 teleport_auth_server_port: 3025
 teleport_data_dir: "/var/lib/teleport"
 
-teleport_log_level: "WARN"
+teleport_log_ouput: stderr
+teleport_log_level: "ERROR"
 teleport_log_path: "/var/log/teleport"
 teleport_log_file: "teleport.log"
-teleport_storage_type: "bolt"
 teleport_pidfile: "/var/run/teleport.pid"
+
+teleport_max_connections: 1000
+teleport_max_users: 250
+
+teleport_storage_type: dir
+teleport_storage_audit_events_uri:
+  - "file:///var/lib/teleport/log"
+teleport_storage_audit_sessions_uri: "'s3://example.com/path/to/bucket?region=us-east-1'"
 
 # auth service
 teleport_auth_enabled: false
@@ -39,19 +47,29 @@ teleport_auth_cluster_name: "main"
 teleport_auth_tokens_node: []
 teleport_auth_tokens_proxy: []
 teleport_auth_tokens_auth: []
-teleport_auth_trusted_clusters: []
-teleport_auth_oidc_connectors: []
+teleport_auth_session_recording: node
+teleport_auth_proxy_checks_host_keys: yes
+teleport_auth_client_idle_timeout: never
+teleport_auth_disconnect_expired_cert: no
 
 # ssh service
 teleport_ssh_enabled: false
 teleport_ssh_listen_address: "0.0.0.0:3022"
-teleport_labels: []
-teleport_commands: []
+teleport_ssh_labels: []
+teleport_ssh_commands: []
+teleport_ssh_pam_enabled: no
+teleport_ssh_pam_service_name: sshd
 
 # proxy service
 teleport_proxy_enabled: false
 teleport_proxy_listen_address: "0.0.0.0:3023"
 teleport_proxy_web_listen_address: "0.0.0.0:3080"
 teleport_proxy_tunnel_listen_address: "0.0.0.0:3024"
+teleport_proxy_public_addr: "{{ ansible_fqdn }}:3080"
+teleport_proxy_ssh_public_addr: "{{ ansible_fqdn }}:3023"
 teleport_proxy_https_key_file: ""
 teleport_proxy_https_cert_file: ""
+teleport_kubernetes_enabled: no
+teleport_kubernetes_listen_addr: "0.0.0.0:3026"
+teleport_kubernetes_public_addr: []
+teleport_kubernetes_kubeconfig_file: ""
