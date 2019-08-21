@@ -1,3 +1,5 @@
+#jinja2: trim_blocks: False
+#jinja2: lstrip_blocks: False
 [Unit]
 Description=Teleport Service
 After=network.target
@@ -5,7 +7,7 @@ After=network.target
 [Service]
 Type=simple
 Restart=always
-ExecStart={{ teleport_bin_path }}/teleport start --config={{ teleport_conf_path }} {{ teleport_opts | default('') }}
+ExecStart={{ teleport_bin_path }}/teleport start --config={{ teleport_conf_path }}{% if teleport_temp_token is defined %} --token={{ teleport_temp_token }}{% endif %}{% if teleport_metrics %} --diag-addr={{ teleport_metrics_url }}{% endif %}{% if teleport_opts is defined %} {{ teleport_opts }}{% endif %}
 ExecStartPost=/bin/sh -c "echo $MAINPID > {{ systemd_pid_file }}"
 ExecReload=/bin/kill -HUP $MAINPID
 PIDFile={{ systemd_pid_file }}

@@ -1,18 +1,18 @@
 teleport:
   nodename: {{ teleport_nodename }}
-  pid_file: {{ teleport_pidfile }}
-{% if teleport_auth_token %}
-  auth_token: {{ teleport_auth_token }}
+  data_dir: {{ teleport_data_dir }}
+{% if teleport_invite_token | default(false) %}
+  auth_token: {{ teleport_invite_token }}
 {% endif %}
-{% if teleport_ca_pin %}
-  ca_pin: {{ teleport_ca_pin }}
-{% endif %}}
+{% if teleport_ca_pin | default(false) %}
+  ca_pin: "{{ teleport_ca_pin }}"
+{% endif %}
 {% if teleport_advertise_ip | default(false) %}
   advertise_ip: {{ teleport_advertise_ip }}
 {% endif %}
   auth_servers:
-{% for auth_server in groups["teleport-auth"] %}
-    - {{ auth_server }}:{{ teleport_auth_server_port }}
+{% for auth_server in groups["teleport_auth"] %}
+    - {{ hostvars[auth_server].ansible_default_ipv4.address }}:{{ teleport_auth_server_port }}
 {% endfor %}
   connection_limits:
     max_connections: {{ teleport_max_connections }}
@@ -22,52 +22,48 @@ teleport:
     severity: {{ teleport_log_level }}
   storage:
     type: {{ teleport_storage_type }}
+{% if teleport_storage_audit_events_uri | default(false) %}
     audit_events_uri: {{ teleport_storage_audit_events_uri | to_json }}
+{% endif %}
+{% if teleport_storage_audit_sessions_uri | default(false) %}
     audit_sessions_uri: {{ teleport_storage_audit_sessions_uri }}
-  data_dir: {{ teleport_data_dir }}
-  ciphers:
-    - aes128-ctr
-    - aes192-ctr
-    - aes256-ctr
-    - aes128-gcm@openssh.com
-    - chacha20-poly1305@openssh.com
-  kex_algos:
-    - curve25519-sha256@libssh.org
-    - ecdh-sha2-nistp256
-    - ecdh-sha2-nistp384
-    - ecdh-sha2-nistp521
-  mac_algos:
-    - hmac-sha2-256-etm@openssh.com
-    - hmac-sha2-256
-  ciphersuites:
-    - tls-rsa-with-aes-128-gcm-sha256
-    - tls-rsa-with-aes-256-gcm-sha384
-    - tls-ecdhe-rsa-with-aes-128-gcm-sha256
-    - tls-ecdhe-ecdsa-with-aes-128-gcm-sha256
-    - tls-ecdhe-rsa-with-aes-256-gcm-sha384
-    - tls-ecdhe-ecdsa-with-aes-256-gcm-sha384
-    - tls-ecdhe-rsa-with-chacha20-poly1305
-    - tls-ecdhe-ecdsa-with-chacha20-poly1305
+{% endif %}
 auth_service:
 {% if is_teleport_auth | default(false) %}
   enabled: yes
+  cluster_name: "{{ teleport_auth_cluster_name }}"
+  authentication:
+    type: {{ teleport_auth_type }}
+{% if teleport_auth_second_factor == "otp" %}
+    second_factor: otp
+{% elif teleport_auth_second_factor == "u2f" %}
+    second_factor: u2f
+    u2f:
+      app_id: https://localhost:3080
+    facets:
+      - https://localhost:3080
+{% else %}
+    second_factor: off
+{% endif %}
   listen_addr: {{ teleport_auth_listen_address }}
-{% if teleport_auth_tokens_node|length > 0 or teleport_auth_tokens_proxy|length > 0 or teleport_auth_tokens_auth|length > 0 %}
+{% if teleport_auth_public_addr | default(false) %}
+{% if teleport_auth_public_addr is iterable %}
+  public_addr: {{ teleport_auth_public_addr | to_json }}
+{% else %}
+  public_addr: {{ teleport_auth_public_addr }}
+{% endif %}
+{% endif %}
+{% if teleport_auth_tokens|length > 0 %}
   tokens:
-{% for token in teleport_auth_tokens_node %}
-    - "node:{{ token }}"
-{% endfor %}
-{% for token in teleport_auth_tokens_proxy %}
-    - "proxy:{{ token }}"
-{% endfor %}
-{% for token in teleport_auth_tokens_auth %}
-    - "auth:{{ token }}"
+{% for token in teleport_auth_tokens %}
+    - "{{ token }}"
 {% endfor %}
 {% endif %}
   session_recording: "{{ teleport_auth_session_recording }}"
   proxy_checks_host_keys: {{ teleport_auth_proxy_checks_host_keys }}
   client_idle_timeout: {{ teleport_auth_client_idle_timeout }}
   disconnect_expired_cert: {{ teleport_auth_disconnect_expired_cert }}
+  keep_alive_count_max: {{ teleport_auth_keep_alive_count_max }}
 {% else %}
   enabled: no
 {% endif %}
@@ -75,9 +71,13 @@ ssh_service:
 {% if is_teleport | default(false) %}
   enabled: yes
   listen_addr: {{ teleport_ssh_listen_address }}
-{% if teleport_public_addr | default(false) %}
-  public_addr: {{ teleport_public_addr | to_json }}
-{% endif %}}
+{% if teleport_ssh_public_addr | default(false) %}
+{% if teleport_ssh_public_addr is iterable %}
+  public_addr: {{ teleport_ssh_public_addr | to_json }}
+{% else %}
+  public_addr: {{ teleport_ssh_public_addr }}
+{% endif %}
+{% endif %}
 {% if teleport_ssh_labels | default(false) %}
   labels:
 {% for label in teleport_ssh_labels %}
@@ -98,7 +98,11 @@ ssh_service:
 {% endfor %}
 {% endfor %}
 {% endif %}
+{% if teleport_ssh_permit_user_env %}
+  permit_user_env: true
+{% else %}
   permit_user_env: false
+{% endif %}
   pam:
     enabled: {{ teleport_ssh_pam_enabled }}
     service_name: {{ teleport_ssh_pam_service_name }}
@@ -111,20 +115,32 @@ proxy_service:
   listen_addr: {{ teleport_proxy_listen_address }}
   web_listen_addr: {{ teleport_proxy_web_listen_address }}
   tunnel_listen_addr: {{ teleport_proxy_tunnel_listen_address }}
+{% if teleport_proxy_public_addr | default(false) %}
+{% if teleport_proxy_public_addr is iterable %}
+  public_addr: {{ teleport_proxy_public_addr | to_json }}
+{% else %}
   public_addr: {{ teleport_proxy_public_addr }}
+{% endif %}
+{% endif %}
   ssh_public_addr: {{ teleport_proxy_ssh_public_addr }}
 {% if teleport_proxy_https_key_file %}
   https_key_file: {{ teleport_proxy_https_key_file }}
   https_cert_file: {{ teleport_proxy_https_cert_file }}
 {% endif %}
-{% if is_teleport_proxy | default(false) %}
   kubernetes:
+{% if teleport_kubernetes_enabled | default(false) %}
     enabled: yes
     listen_addr: {{ teleport_kubernetes_listen_addr }}
+{% if teleport_kubernetes_public_addr | default(false) %}
+{% if teleport_kubernetes_public_addr is iterable %}
     public_addr: {{ teleport_kubernetes_public_addr | to_json }}
+{% else %}
+    public_addr: {{ teleport_kubernetes_public_addr }}
+{% endif %}
+{% endif %}
 {% if teleport_kubernetes_kubeconfig_file | default(false) %}
     kubeconfig_file: {{ teleport_kubernetes_kubeconfig_file }}
-{% endif %}}
+{% endif %}
 {% else %}
     enabled: no
 {% endif %}

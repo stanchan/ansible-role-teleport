@@ -1,0 +1,22 @@
+---
+- name: Set roles
+  include_tasks: roles.yml
+
+- name: Set ca_pin
+  set_fact:
+    teleport_ca_pin: "{{ hostvars[groups['teleport_auth'][0]]['teleport_ca_pin'] }}"
+
+- name: Set token for auth service
+  set_fact:
+    teleport_invite_token: "{{ hostvars[groups['teleport_auth'][0]]['teleport_temp_token_auth'] }}"
+  when: is_teleport_auth
+
+- name: Set token for proxy service
+  set_fact:
+    teleport_invite_token: "{{ hostvars[groups['teleport_auth'][0]]['teleport_temp_token_proxy'] }}"
+  when: is_teleport_proxy and not is_teleport_auth
+
+- name: Set token for node service
+  set_fact:
+    teleport_invite_token: "{{ hostvars[groups['teleport_auth'][0]]['teleport_temp_token_node'] }}"
+  when: is_teleport and not is_teleport_proxy and not is_teleport_auth

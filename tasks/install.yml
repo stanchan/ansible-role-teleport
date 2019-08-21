@@ -5,7 +5,7 @@
     chdir: "{{ teleport_bin_path }}"
   register: teleport_check
   ignore_errors: yes
-  changed_when: yes
+  changed_when: no
 
 - name: Set teleport_package for Alpine
   set_fact:

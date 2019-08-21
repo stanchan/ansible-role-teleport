@@ -4,7 +4,7 @@ systemd_service_dir: /etc/systemd/system
 systemd_pid_dir: /run/teleport
 systemd_pid_file: "{{ systemd_pid_dir }}/teleport.pid"
 
-teleport_nodename: "{{ ansible_fqdn }}"
+teleport_nodename: "{{ ansible_hostname }}"
 teleport_user: root
 teleport_group: root
 
@@ -19,54 +19,76 @@ teleport_linux_arm_url: "{{ teleport_repo_base_url }}/v{{ teleport_version }}/{{
 teleport_verify_ssl: yes
 teleport_releases_path: "{{ teleport_data_dir }}/releases"
 teleport_bin_path: /usr/local/bin
-teleport_force_deploy: false
+teleport_force_deploy: no
 teleport_ssl_cert_path: "/etc/teleport/certs"
 teleport_conf_path: "/etc/teleport/teleport.yaml"
-teleport_auth_token: ""
-teleport_auth_server_port: 3025
+teleport_pidfile: "/var/run/teleport.pid"
+
+teleport_temp_token_ttl: "5m"
+teleport_temp_token_node: null
+teleport_temp_token_proxy: null
+teleport_temp_token_auth: null
+
 teleport_data_dir: "/var/lib/teleport"
 
-teleport_log_ouput: stderr
+teleport_auth_server_port: 3025
+teleport_ssh_server_port: 3022
+teleport_proxy_server_port: 3023
+teleport_proxy_tunnel_server_port: 3024
+teleport_proxy_web_server_port: 3080
+
+teleport_log_ouput: stdout
 teleport_log_level: "ERROR"
 teleport_log_path: "/var/log/teleport"
 teleport_log_file: "teleport.log"
-teleport_pidfile: "/var/run/teleport.pid"
+
+teleport_metrics: yes
+teleport_metrics_url: http://127.0.0.1:3434
+
+teleport_ca_pin: null
+
+teleport_advertise_ip: "{{ hostvars[inventory_hostname].ansible_default_ipv4.address }}"
 
 teleport_max_connections: 1000
 teleport_max_users: 250
 
 teleport_storage_type: dir
-teleport_storage_audit_events_uri:
-  - "file:///var/lib/teleport/log"
-teleport_storage_audit_sessions_uri: "'s3://example.com/path/to/bucket?region=us-east-1'"
+teleport_storage_audit_events_uri: null
+teleport_storage_audit_sessions_uri: null
 
 # auth service
-teleport_auth_enabled: false
-teleport_auth_listen_address: "0.0.0.0:3025"
-teleport_auth_cluster_name: "main"
-teleport_auth_tokens_node: []
-teleport_auth_tokens_proxy: []
-teleport_auth_tokens_auth: []
+teleport_auth_enabled: no
+teleport_auth_listen_address: "0.0.0.0:{{ teleport_auth_server_port }}"
+teleport_auth_public_addr: "{{ ansible_fqdn }}:{{ teleport_auth_server_port }}"
+teleport_auth_cluster_name: main
+teleport_auth_type: local
+teleport_auth_second_factor: otp
+teleport_auth_u2f_app_id: "{{ teleport_proxy_public_addr }}"
+teleport_auth_u2f_facets: []
+teleport_auth_tokens: []
 teleport_auth_session_recording: node
-teleport_auth_proxy_checks_host_keys: yes
+teleport_auth_proxy_checks_host_keys: "yes"
 teleport_auth_client_idle_timeout: never
-teleport_auth_disconnect_expired_cert: no
+teleport_auth_disconnect_expired_cert: "no"
+teleport_auth_keep_alive_count_max: 0
 
 # ssh service
-teleport_ssh_enabled: false
-teleport_ssh_listen_address: "0.0.0.0:3022"
+teleport_ssh_enabled: no
+teleport_ssh_listen_address: "0.0.0.0:{{ teleport_ssh_server_port }}"
+teleport_ssh_public_addr: "{{ ansible_fqdn }}:{{ teleport_ssh_server_port }}"
 teleport_ssh_labels: []
 teleport_ssh_commands: []
-teleport_ssh_pam_enabled: no
+teleport_ssh_permit_user_env: no
+teleport_ssh_pam_enabled: "no"
 teleport_ssh_pam_service_name: sshd
 
 # proxy service
-teleport_proxy_enabled: false
-teleport_proxy_listen_address: "0.0.0.0:3023"
-teleport_proxy_web_listen_address: "0.0.0.0:3080"
-teleport_proxy_tunnel_listen_address: "0.0.0.0:3024"
-teleport_proxy_public_addr: "{{ ansible_fqdn }}:3080"
-teleport_proxy_ssh_public_addr: "{{ ansible_fqdn }}:3023"
+teleport_proxy_enabled: no
+teleport_proxy_listen_address: "0.0.0.0:{{ teleport_proxy_server_port }}"
+teleport_proxy_web_listen_address: "0.0.0.0:{{ teleport_proxy_web_server_port }}"
+teleport_proxy_tunnel_listen_address: "0.0.0.0:{{ teleport_proxy_tunnel_server_port }}"
+teleport_proxy_public_addr: "{{ ansible_fqdn }}:{{ teleport_proxy_web_server_port }}"
+teleport_proxy_ssh_public_addr: "{{ ansible_fqdn }}:{{ teleport_proxy_server_port }}"
 teleport_proxy_https_key_file: ""
 teleport_proxy_https_cert_file: ""
 teleport_kubernetes_enabled: no

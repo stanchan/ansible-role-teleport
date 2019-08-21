@@ -1,0 +1,52 @@
+---
+- name: get ca_pin
+  shell: "tctl status"
+  run_once: yes
+  ignore_errors: yes
+  changed_when: no
+  register: ca_pin_results
+
+- set_fact:
+    teleport_ca_pin: "{{ ca_pin_results.stdout | regex_search(regexp, '\\1') | first }}"
+  vars:
+    regexp: 'CA\spin\s*?(sha256:.*?)\s*$'
+  ignore_errors: yes
+
+- name: get auth token
+  shell: "tctl nodes add --ttl={{ teleport_temp_token_ttl }} --roles=auth,node"
+  run_once: yes
+  ignore_errors: yes
+  changed_when: no
+  register: auth_token_results
+
+- set_fact:
+    teleport_temp_token_auth: "{{ auth_token_results.stdout | regex_search(regexp, '\\1') | first }}"
+  vars:
+    regexp: '^The\sinvite\stoken:\s(.*?)\n'
+  ignore_errors: yes
+
+- name: get proxy token
+  shell: "tctl nodes add --ttl={{ teleport_temp_token_ttl }} --roles=proxy,node"
+  run_once: yes
+  ignore_errors: yes
+  changed_when: no
+  register: proxy_token_results
+
+- set_fact:
+    teleport_temp_token_proxy: "{{ proxy_token_results.stdout | regex_search(regexp, '\\1') | first }}"
+  vars:
+    regexp: '^The\sinvite\stoken:\s(.*?)\n'
+  ignore_errors: yes
+
+- name: get node token
+  shell: "tctl nodes add --ttl={{ teleport_temp_token_ttl }} --roles=node"
+  run_once: yes
+  ignore_errors: yes
+  changed_when: no
+  register: node_token_results
+
+- set_fact:
+    teleport_temp_token_node: "{{ node_token_results.stdout | regex_search(regexp, '\\1') | first }}"
+  vars:
+    regexp: '^The\sinvite\stoken:\s(.*?)\n'
+  ignore_errors: yes

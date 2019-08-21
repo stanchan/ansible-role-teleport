@@ -1,3 +1,6 @@
+#jinja2: trim_blocks: False
+#jinja2: lstrip_blocks: False
+#jinja2: strip_trailing_newlines: False
 #! /bin/sh
 ### BEGIN INIT INFO
 # Provides:          teleport
@@ -22,7 +25,7 @@ ROOT={{ teleport_data_dir }}
 LOG_PATH={{ teleport_log_path }}
 LOG_FILE={{ teleport_log_file }}
 DAEMON={{ teleport_bin_path }}/$NAME
-DAEMON_ARGS="start --config={{ teleport_conf_path }} {{ teleport_opts | default('') }}"                  # you can pass any flags to your program here
+DAEMON_ARGS="start --config={{ teleport_conf_path }}{% if teleport_temp_token is defined %} --token={{ teleport_temp_token }}{% endif %}{% if teleport_metrics %} --diag-addr={{ teleport_metrics_url }}{% endif %}{% if teleport_opts is defined %} {{ teleport_opts }}{% endif %}"                  # you can pass any flags to your program here
 PIDFILE={{ teleport_pidfile }}
 SCRIPTNAME=/etc/init.d/$NAME
 
