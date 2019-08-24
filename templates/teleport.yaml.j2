@@ -87,9 +87,9 @@ ssh_service:
 {% if teleport_ssh_commands | default(false) %}
   commands:
 {% for commands in teleport_ssh_commands %}
-{% for name, attributes in commands.iteritems() %}
+{% for name, attributes in commands.items() %}
   - name: {{ name }}
-{% for key, value in attributes.iteritems() %}
+{% for key, value in attributes.items() %}
 {% if key == "command" %}    command: {{ value }}
 {% elif key == "period" %}    period: {{ value }}
 {% else %}    {{ key }}: {{ value }}
