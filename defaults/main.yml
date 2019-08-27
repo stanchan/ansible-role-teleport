@@ -59,7 +59,7 @@ teleport_storage_audit_sessions_uri: null
 # auth service
 teleport_auth_enabled: no
 teleport_auth_listen_address: "0.0.0.0:{{ teleport_auth_server_port }}"
-teleport_auth_public_addr: "{{ ansible_fqdn }}:{{ teleport_auth_server_port }}"
+teleport_auth_public_addr: null
 teleport_auth_cluster_name: main
 teleport_auth_type: local
 teleport_auth_second_factor: otp
