@@ -8,7 +8,7 @@ teleport_nodename: "{{ ansible_hostname }}"
 teleport_user: root
 teleport_group: root
 
-teleport_version: 4.0.4
+teleport_version: 4.1.2
 teleport_repo_base_url: https://github.com/stanchan/teleport/releases/download
 teleport_alpine_package: "teleport-v{{ teleport_version }}-linux-amd64-bin-alpine.tar.gz"
 teleport_linux_package: "teleport-v{{ teleport_version }}-linux-amd64-bin.tar.gz"
