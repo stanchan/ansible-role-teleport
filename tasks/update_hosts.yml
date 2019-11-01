@@ -1,0 +1,21 @@
+---
+- name: Set facts
+  include_tasks: set_facts.yml
+
+  - name: Update hosts file
+    local_action:
+      module: template
+      src: teleport_hosts.j2
+      dest: /tmp/hosts
+      mode: 0644
+    run_once: true
+
+  - name: Deploy hosts file
+    copy:
+      src: /tmp/hosts
+      dest: /etc/hosts
+      owner: root
+      group: root
+      mode: 0644
+    when: teleport_deploy_host_file
+  when: teleport_manage_host_file

@@ -1,0 +1,12 @@
+---
+- name: Set teleport_host_ip
+  set_fact:
+    teleport_host_ip: "{{ hostvars[inventory_hostname][teleport_netif]['ipv4']['address'] }}"
+    cacheable: "{{ teleport_host_ip_cache }}"
+  when: teleport_host_ip is not defined
+
+- name: Set roles
+  set_fact:
+    is_teleport: "{{ inventory_hostname in groups['teleport'] }}"
+    is_teleport_auth: "{{ inventory_hostname in groups['teleport_auth'] }}"
+    is_teleport_proxy: "{{ inventory_hostname in groups['teleport_proxy'] }}"

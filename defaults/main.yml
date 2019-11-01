@@ -4,7 +4,16 @@ systemd_service_dir: /etc/systemd/system
 systemd_pid_dir: /run/teleport
 systemd_pid_file: "{{ systemd_pid_dir }}/teleport.pid"
 
-teleport_nodename: "{{ ansible_hostname }}"
+teleport_nodename: "{% if teleport_override_system_hostname %}{{ inventory_hostname }}{% else %}{{ ansible_hostname }}{% endif %}"
+teleport_domain: ""
+
+teleport_manage_host_file: no
+teleport_deploy_host_file: yes
+teleport_override_system_hostname: yes
+teleport_hostgroup: teleport
+teleport_netif: ansible_eth0
+teleport_host_ip_cache: yes
+
 teleport_user: root
 teleport_group: root
 

@@ -1,6 +1,6 @@
 ---
-- name: Set roles
-  include_tasks: roles.yml
+- name: Set facts
+  include_tasks: set_facts.yml
 
 - name: Setup prereqs
   include_tasks: prereqs.yml

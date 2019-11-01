@@ -1,6 +1,0 @@
----
-- name: Set roles
-  set_fact:
-    is_teleport: "{{ inventory_hostname in groups['teleport'] }}"
-    is_teleport_auth: "{{ inventory_hostname in groups['teleport_auth'] }}"
-    is_teleport_proxy: "{{ inventory_hostname in groups['teleport_proxy'] }}"
