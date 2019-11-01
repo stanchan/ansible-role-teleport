@@ -2,6 +2,7 @@
 - name: Set facts
   include_tasks: set_facts.yml
 
+- block:
   - name: Update hosts file
     local_action:
       module: template
